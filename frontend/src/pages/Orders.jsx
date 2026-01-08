@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
 import Layout from '../components/Layout';
+import toast from 'react-hot-toast';
 import { Plus, X, Loader2, Edit, Trash2, RefreshCw, ClipboardList } from 'lucide-react';
 
-// Hardcodeo de opciones para el select (Mapeado a la nueva columna Descripcion)
 const OPCIONES_PEDIDOS = [
     { id: 1, nombre: "Mesa Blackjack 01", precio: 500.00 },
     { id: 2, nombre: "Ruleta Europea 05", precio: 250.75 },
@@ -17,10 +17,9 @@ export default function Orders() {
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    // Estado inicial ajustado al nuevo DTO del backend
     const [formData, setFormData] = useState({
         cliente: '',
-        descripcion: '', // Reemplaza a numeroPedido en el formulario
+        descripcion: '',
         total: 0,
         estado: 'Registrado'
     });
@@ -33,7 +32,7 @@ export default function Orders() {
             const response = await api.get('/pedidos');
             setOrders(response.data);
         } catch (error) {
-            console.error("Error al cargar pedidos:", error);
+            toast.error("Error al cargar pedidos");
         } finally {
             setIsLoading(false);
         }
@@ -54,9 +53,10 @@ export default function Orders() {
         if (window.confirm(`¿Seguro que deseas eliminar el registro #${id}?`)) {
             try {
                 await api.delete(`/pedidos/${id}`);
+                toast.success('Pedido eliminado correctamente');
                 fetchOrders();
             } catch (error) {
-                alert("Error al eliminar el registro.");
+                toast.error('Error al eliminar el registro');
             }
         }
     };
@@ -64,37 +64,37 @@ export default function Orders() {
     const handlePedidoChange = (e) => {
         const nombreMesa = e.target.value;
         const opcion = OPCIONES_PEDIDOS.find(opt => opt.nombre === nombreMesa);
-
         setFormData({
             ...formData,
-            descripcion: nombreMesa, // Guardamos el nombre de la mesa
+            descripcion: nombreMesa,
             total: opcion ? opcion.precio : 0
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const payload = {
+            cliente: formData.cliente,
+            total: parseFloat(formData.total),
+            descripcion: formData.descripcion
+        };
+
+        const operation = editingId
+            ? api.put(`/pedidos/${editingId}`, { ...payload, id: editingId, estado: formData.estado })
+            : api.post('/pedidos', payload);
+
+        toast.promise(operation, {
+            loading: 'Guardando registro...',
+            success: editingId ? '¡Pedido actualizado!' : '¡Pedido registrado!',
+            error: 'No se pudo procesar la solicitud',
+        });
+
         try {
-            // El payload ahora coincide con CreatePedidoRequest del backend
-            const payload = {
-                cliente: formData.cliente,
-                total: parseFloat(formData.total),
-                descripcion: formData.descripcion // Campo clave para evitar el Error 400
-            };
-
-            if (editingId) {
-                await api.put(`/pedidos/${editingId}`, { ...payload, id: editingId, estado: formData.estado });
-            } else {
-                // En creación, el backend autogenera el NumeroPedido
-                await api.post('/pedidos', payload);
-            }
-
+            await operation;
             closeModal();
             fetchOrders();
         } catch (error) {
-            // Log detallado para depurar validaciones de .NET
-            console.error("Detalles del error 400:", error.response?.data);
-            alert("Error de validación: Verifique los campos enviados.");
+            console.error(error);
         }
     };
 
@@ -156,7 +156,7 @@ export default function Orders() {
                                         </span>
                                     </td>
                                     <td className="p-5 text-right font-bold text-slate-900">S/ {parseFloat(o.total || 0).toFixed(2)}</td>
-                                    <td className="p-5">
+                                    <td className="p-5 text-center">
                                         <div className="flex justify-center gap-2">
                                             <button onClick={() => handleEdit(o)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-all">
                                                 <Edit size={18} />
@@ -201,7 +201,6 @@ export default function Orders() {
                                     onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
                                 />
                             </div>
-
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Seleccionar Mesa</label>
                                 <select
@@ -216,7 +215,6 @@ export default function Orders() {
                                     ))}
                                 </select>
                             </div>
-
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Monto Total</label>
                                 <input
@@ -225,7 +223,6 @@ export default function Orders() {
                                     value={`S/ ${formData.total.toFixed(2)}`}
                                 />
                             </div>
-
                             <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 shadow-lg active:scale-95 transition-all">
                                 {editingId ? 'Actualizar Registro' : 'Guardar Registro'}
                             </button>
