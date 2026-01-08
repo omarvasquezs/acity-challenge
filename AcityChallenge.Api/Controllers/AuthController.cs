@@ -1,12 +1,15 @@
 using AcityChallenge.Application.Usuarios.Commands.Login;
+using AcityChallenge.Application.Usuarios.Commands.Logout; // Agregado
 using AcityChallenge.Application.Usuarios.Common;
 using MediatR;
+using Microsoft.AspNetCore.Authorization; // Agregado para [Authorize]
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AcityChallenge.Api.Controllers;
 
 [ApiController]
-[Route("auth")] // Esto establece la base como /auth
+[Route("auth")]
 public class AuthController : ControllerBase
 {
     private readonly ISender _mediator;
@@ -16,11 +19,22 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("login")] // Esto completa la ruta como /auth/login
+    [HttpPost("login")]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginCommand command)
     {
-        // El mediador procesa la validación contra BD y generación de JWT
         var result = await _mediator.Send(command);
         return Ok(result);
+    }
+
+    [Authorize] // Atributo ahora reconocido
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var email = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(email)) return Unauthorized();
+
+        var result = await _mediator.Send(new LogoutCommand(email));
+        return result ? Ok(new { mensaje = "Sesión cerrada exitosamente." }) : BadRequest();
     }
 }

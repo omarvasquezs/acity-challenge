@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Claims;
 using AcityChallenge.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using AcityChallenge.Infrastructure;
 using AcityChallenge.Application;
+using AcityChallenge.Application.Common.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,30 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var db = context.HttpContext.RequestServices.GetRequiredService<IApplicationDbContext>();
+            var email = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var stampInToken = context.Principal?.FindFirstValue("SecurityStamp");
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(stampInToken))
+            {
+                context.Fail("Token incompleto.");
+                return;
+            }
+
+            var usuario = await db.Usuarios.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (usuario == null || usuario.SecurityStamp != stampInToken)
+            {
+                // El sello no coincide: la sesión fue destruida por un Logout o cambio de clave
+                context.Fail("La sesión ha expirado o ha sido cerrada.");
+            }
+        }
     };
 });
 
