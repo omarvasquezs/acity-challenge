@@ -1,12 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react'; // Añadido useEffect
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import { ShoppingCart, Users, LogOut, ShieldCheck, UserCircle, Loader2 } from 'lucide-react';
 
 export default function Layout({ children }) {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [user, setUser] = useState(null); // Estado para almacenar datos del usuario
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Consultamos el perfil del usuario al montar el componente
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                // Endpoint que extrae el email del Claim del Token
+                const response = await api.get('/usuarios/perfil');
+                setUser(response.data);
+            } catch (error) {
+                console.error("Error al obtener perfil:", error);
+            }
+        };
+        fetchUserProfile();
+    }, []);
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
@@ -22,7 +37,6 @@ export default function Layout({ children }) {
         }
     };
 
-    // Función auxiliar para clases de enlaces activos
     const linkClass = (path) =>
         `flex items-center gap-3 p-3 rounded-lg transition-all ${location.pathname === path
             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
@@ -49,7 +63,6 @@ export default function Layout({ children }) {
                     <Link to="/pedidos" className={linkClass('/pedidos')}>
                         <ShoppingCart size={20} /> Pedidos
                     </Link>
-                    {/* Ahora Usuarios se resaltará correctamente */}
                     <Link to="/usuarios" className={linkClass('/usuarios')}>
                         <Users size={20} /> Usuarios
                     </Link>
@@ -69,9 +82,12 @@ export default function Layout({ children }) {
             <main className="flex-1 flex flex-col overflow-hidden">
                 <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm">
                     <h2 className="text-slate-600 font-semibold uppercase text-xs tracking-widest">Dashboard</h2>
-                    <div className="flex items-center gap-3 text-slate-700 font-medium">
+
+                    {/* SECCIÓN ACTUALIZADA DINÁMICAMENTE */}
+                    <div className="flex items-center gap-3 text-slate-700 font-bold">
                         <UserCircle size={20} className="text-blue-600" />
-                        <span>Seguridad</span>
+                        {/* Mostramos el nombre si existe, de lo contrario un placeholder */}
+                        <span>{user ? user.nombre : 'Cargando...'}</span>
                     </div>
                 </header>
 
