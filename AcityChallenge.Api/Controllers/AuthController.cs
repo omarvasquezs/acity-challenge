@@ -1,15 +1,15 @@
 using AcityChallenge.Application.Usuarios.Commands.Login;
-using AcityChallenge.Application.Usuarios.Commands.Logout; // Agregado
+using AcityChallenge.Application.Usuarios.Commands.Logout;
 using AcityChallenge.Application.Usuarios.Common;
 using MediatR;
-using Microsoft.AspNetCore.Authorization; // Agregado para [Authorize]
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace AcityChallenge.Api.Controllers;
 
 [ApiController]
-[Route("auth")]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly ISender _mediator;
