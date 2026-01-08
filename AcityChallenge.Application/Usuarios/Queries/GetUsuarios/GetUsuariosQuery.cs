@@ -17,10 +17,11 @@ public class GetUsuariosQueryHandler : IRequestHandler<GetUsuariosQuery, List<Us
     {
         return await _context.Usuarios
             .Select(u => new UsuarioPerfilResponse(
-                u.Nombre,        // 1. string
-                u.Email,         // 2. string
-                u.Rol,           // 3. string
-                u.FechaCreacion  // 4. DateTime
+                u.Id,            // 1. Guid
+                u.Nombre,        // 2. string
+                u.Email,         // 3. string
+                u.Rol,           // 4. string
+                u.FechaCreacion  // 5. DateTime
             ))
             .ToListAsync(cancellationToken);
     }

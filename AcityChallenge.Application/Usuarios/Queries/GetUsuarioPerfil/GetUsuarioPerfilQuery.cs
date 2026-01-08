@@ -17,14 +17,15 @@ public class GetUsuarioPerfilQueryHandler : IRequestHandler<GetUsuarioPerfilQuer
         _context = context;
     }
 
-    public async Task<UsuarioPerfilResponse> Handle(GetUsuarioPerfilQuery request, CancellationToken cancellationToken)
+    public async Task<UsuarioPerfilResponse?> Handle(GetUsuarioPerfilQuery request, CancellationToken cancellationToken)
     {
         var usuario = await _context.Usuarios
             .Where(u => u.Email == request.Email)
             .Select(u => new UsuarioPerfilResponse(
+                u.Id,
                 u.Nombre,
                 u.Email,
-                u.Rol, // <--- AGREGA ESTA LÍNEA (El tercer parámetro string)
+                u.Rol,
                 u.FechaCreacion
             ))
             .FirstOrDefaultAsync(cancellationToken);
