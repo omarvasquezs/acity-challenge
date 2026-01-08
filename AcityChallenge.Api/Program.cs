@@ -43,6 +43,13 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+app.UseMiddleware<AcityChallenge.Api.Middlewares.ExceptionHandlingMiddleware>();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
