@@ -28,8 +28,10 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Pedido>(entity =>
         {
+            entity.HasKey(e => e.Id);
             entity.Property(p => p.Total).HasColumnType("decimal(10,2)");
             entity.HasIndex(p => p.NumeroPedido).IsUnique();
+            entity.Property(p => p.Descripcion).HasMaxLength(250);
         });
     }
 }

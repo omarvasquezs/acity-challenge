@@ -5,6 +5,7 @@ public class Pedido
     public int Id { get; set; }
     public string NumeroPedido { get; set; } = string.Empty;
     public string Cliente { get; set; } = string.Empty;
+    public string? Descripcion { get; set; }
     public DateTime Fecha { get; set; } = DateTime.UtcNow;
     public decimal Total { get; set; }
     public string Estado { get; set; } = "Registrado";
