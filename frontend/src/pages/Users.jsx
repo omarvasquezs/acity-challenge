@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
 import Layout from '../components/Layout';
-import { Plus, X, Loader2, Edit, Trash2, UserPlus, Shield } from 'lucide-react';
+import { Plus, X, Loader2, Edit, Trash2, UserPlus, Shield, Lock } from 'lucide-react';
 
 export default function Users() {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
 
+    // Estado inicial actualizado con 'password' y roles corregidos
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
-        rol: 'Operador',
+        rol: 'User',
         password: ''
     });
 
@@ -20,7 +21,6 @@ export default function Users() {
     const fetchUsers = async () => {
         setIsLoading(true);
         try {
-            // Esto llamará a GET /api/usuarios
             const response = await api.get('/usuarios');
             setUsers(response.data);
         } catch (error) {
@@ -33,12 +33,14 @@ export default function Users() {
     const handleCreateUser = async (e) => {
         e.preventDefault();
         try {
-            await api.post('/usuarios', formData);
+            // Se envía a /registrar según la definición de tu UsuariosController
+            await api.post('/usuarios/registrar', formData);
             setShowModal(false);
-            setFormData({ nombre: '', email: '', rol: 'Operador', password: '' });
+            setFormData({ nombre: '', email: '', rol: 'User', password: '' });
             fetchUsers();
         } catch (error) {
             console.error("Error al crear usuario:", error.response?.data);
+            alert("Error al registrar: Verifique que el correo no esté en uso.");
         }
     };
 
@@ -47,11 +49,11 @@ export default function Users() {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Gestión de Usuarios</h2>
-                    <p className="text-slate-500 text-sm">Control de acceso y roles para el personal de Atlantic City.</p>
+                    <p className="text-slate-500 text-sm italic">Administración de accesos Atlantic City.</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="cursor-pointer bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-blue-200 transition-all hover:bg-blue-700"
+                    className="cursor-pointer bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
                 >
                     <UserPlus size={20} /> Nuevo Usuario
                 </button>
@@ -72,60 +74,108 @@ export default function Users() {
                             <tr>
                                 <td colSpan="4" className="p-20 text-center">
                                     <Loader2 className="animate-spin inline text-blue-600" size={32} />
+                                    <p className="mt-2 text-slate-400 font-medium">Cargando personal...</p>
                                 </td>
                             </tr>
                         ) : users.length > 0 ? (
                             users.map((u) => (
-                                <tr key={u.id} className="hover:bg-slate-50/40 transition-colors">
+                                <tr key={u.id || u.email} className="hover:bg-slate-50/40 transition-colors">
                                     <td className="p-5 font-semibold text-slate-700">{u.nombre}</td>
                                     <td className="p-5 text-slate-500">{u.email}</td>
                                     <td className="p-5">
                                         <div className="flex items-center gap-2">
-                                            <Shield size={14} className="text-blue-500" />
-                                            <span className="text-sm font-medium text-slate-600">{u.rol}</span>
+                                            <Shield size={14} className={u.rol === 'Admin' ? 'text-amber-500' : 'text-blue-500'} />
+                                            <span className={`text-sm font-bold ${u.rol === 'Admin' ? 'text-amber-700' : 'text-slate-600'}`}>
+                                                {u.rol}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="p-5">
                                         <div className="flex justify-center gap-2">
-                                            <button className="p-2 text-slate-400 hover:text-blue-600 cursor-pointer"><Edit size={18} /></button>
-                                            <button className="p-2 text-slate-400 hover:text-red-500 cursor-pointer"><Trash2 size={18} /></button>
+                                            <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer transition-all">
+                                                <Edit size={18} />
+                                            </button>
+                                            <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg cursor-pointer transition-all">
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="p-20 text-center text-slate-400 italic">No hay usuarios registrados.</td>
+                                <td colSpan="4" className="p-20 text-center">
+                                    <div className="flex flex-col items-center opacity-50">
+                                        <UserPlus size={48} className="text-slate-300 mb-2" />
+                                        <p className="text-slate-500 font-medium italic">No hay usuarios registrados.</p>
+                                    </div>
+                                </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
-            {/* Modal de Registro */}
+            {/* Modal de Registro Mejorado */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-6 border-b flex justify-between items-center bg-slate-50">
-                            <h3 className="text-xl font-bold text-slate-800">Registrar Usuario</h3>
-                            <button onClick={() => setShowModal(false)} className="cursor-pointer text-slate-400 p-1"><X size={24} /></button>
+                            <h3 className="text-xl font-bold text-slate-800">Registrar Nuevo Acceso</h3>
+                            <button onClick={() => setShowModal(false)} className="cursor-pointer text-slate-400 hover:text-slate-600 p-1">
+                                <X size={24} />
+                            </button>
                         </div>
                         <form onSubmit={handleCreateUser} className="p-8 space-y-5">
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Nombre Completo</label>
-                                <input type="text" required className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
+                                <input
+                                    type="text" required
+                                    className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                    value={formData.nombre}
+                                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                                />
                             </div>
+
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Correo Electrónico</label>
-                                <input type="email" required className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                                <input
+                                    type="email" required
+                                    className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                />
                             </div>
+
+                            {/* CAMPO DE CONTRASEÑA AÑADIDO */}
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-2">Contraseña</label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-3.5 text-slate-300" size={18} />
+                                    <input
+                                        type="password" required
+                                        minLength={6}
+                                        placeholder="Mínimo 6 caracteres"
+                                        className="w-full border border-slate-200 rounded-xl p-3 pl-10 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* ROLES CORREGIDOS: Admin y User */}
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Rol del Sistema</label>
-                                <select className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer" value={formData.rol} onChange={(e) => setFormData({ ...formData, rol: e.target.value })}>
-                                    <option value="Admin">Administrador</option>
-                                    <option value="Operador">Operador de Seguridad</option>
+                                <select
+                                    className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer transition-all"
+                                    value={formData.rol}
+                                    onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
+                                >
+                                    <option value="Admin">Admin (Control Total)</option>
+                                    <option value="User">User (Operador)</option>
                                 </select>
                             </div>
+
                             <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 cursor-pointer shadow-lg active:scale-95 transition-all">
                                 Crear Usuario
                             </button>
