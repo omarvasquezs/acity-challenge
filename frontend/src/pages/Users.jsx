@@ -42,6 +42,20 @@ export default function Users() {
         }
     };
 
+    // NUEVA FUNCIÓN: Eliminar Usuario físicamente de la BD
+    const handleDelete = async (id, nombre) => {
+        if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario "${nombre}"? Esta acción es permanente.`)) {
+            try {
+                // Llama al endpoint DELETE /api/usuarios/{id}
+                await api.delete(`/usuarios/${id}`);
+                fetchUsers(); // Recarga la tabla tras borrar
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                alert("No se pudo eliminar al usuario. Verifique sus permisos de Administrador.");
+            }
+        }
+    };
+
     return (
         <Layout>
             <div className="flex justify-between items-center mb-8">
@@ -51,7 +65,6 @@ export default function Users() {
                 </div>
 
                 <div className="flex gap-3">
-                    {/* Botón de refrescar añadido */}
                     <button
                         onClick={fetchUsers}
                         className="p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer transition-all"
@@ -105,7 +118,13 @@ export default function Users() {
                                             <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer transition-all">
                                                 <Edit size={18} />
                                             </button>
-                                            <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg cursor-pointer transition-all">
+
+                                            {/* BOTÓN ELIMINAR CONECTADO */}
+                                            <button
+                                                onClick={() => handleDelete(u.id, u.nombre)}
+                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg cursor-pointer transition-all"
+                                                title="Eliminar usuario"
+                                            >
                                                 <Trash2 size={18} />
                                             </button>
                                         </div>
