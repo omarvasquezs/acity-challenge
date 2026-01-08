@@ -1,0 +1,21 @@
+# Establecer el comportamiento predeterminado para normalizar todas las líneas a LF al hacer commit
+* text=auto
+
+# Asegurar que archivos de código siempre usen LF (estándar de Linux/WSL2)
+*.cs     text diff=csharp
+*.xaml   text
+*.config text
+*.json   text
+*.xml    text
+*.csproj text
+*.sln    text eol=crlf
+
+# Archivos de documentación
+*.md     text
+
+# Evitar que archivos binarios sean normalizados (esto es crítico)
+*.jpg    binary
+*.png    binary
+*.ico    binary
+*.dll    binary
+*.exe    binary
