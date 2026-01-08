@@ -1,6 +1,7 @@
 using AcityChallenge.Application.Common.Interfaces;
 using AcityChallenge.Domain.Entities;
 using MediatR;
+using BCrypt.Net;
 
 namespace AcityChallenge.Application.Usuarios.Commands.RegistrarUsuario;
 
@@ -19,14 +20,14 @@ public class RegistrarUsuarioCommandHandler : IRequestHandler<RegistrarUsuarioCo
 
     public async Task<Guid> Handle(RegistrarUsuarioCommand request, CancellationToken cancellationToken)
     {
-        // Nota Senior: En un paso siguiente agregaremos hashing de password real.
-        // Por ahora, cumplimos con la persistencia básica.
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
         var usuario = new Usuario
         {
             Id = Guid.NewGuid(),
             Nombre = request.Nombre,
             Email = request.Email,
-            PasswordHash = request.Password, // TODO: BCrypt.Net o Argon2
+            PasswordHash = passwordHash,
             FechaCreacion = DateTime.UtcNow
         };
 
