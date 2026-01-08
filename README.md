@@ -1,28 +1,67 @@
-# Acity Challenge - Sistema de Autenticación
+# Atlantic City Challenge - Sistema de Gestión de Pedidos y Usuarios
 
-Este proyecto es una solución técnica para el desafío de **Atlantic City**, desarrollada bajo los principios de **Arquitectura Limpia (Clean Architecture)** y **CQRS** utilizando .NET 9.
+Este proyecto es una solución técnica integral desarrollada bajo los principios de Arquitectura Limpia (Clean Architecture) y CQRS utilizando .NET 9.
 
 ## 🚀 Tecnologías Utilizadas
 
-* **Framework:** .NET 9 (ASP.NET Core API)
-* **Arquitectura:** Clean Architecture (Domain, Application, Infrastructure, Api)
-* **Persistencia:** Entity Framework Core con SQL Server
-* **Seguridad:** BCrypt para hashing de contraseñas y JWT (JSON Web Tokens) para autorización
-* **Patrones:** CQRS con MediatR
-* **Entorno:** Desarrollado en WSL2 (Ubuntu) con conexión a SQL Server en Host Windows
+### Backend (.NET 9)
+* Framework: ASP.NET Core API con Clean Architecture.
+* Patrones: CQRS con MediatR para la separación de comandos y consultas.
+* Persistencia: Entity Framework Core con SQL Server.
+* Seguridad: Autenticación JWT y Hashing de contraseñas con BCrypt.
+
+### Frontend (React + Vite)
+* UI: Tailwind CSS para un diseño moderno y responsivo.
+* Iconografía: Lucide-react.
+* Cliente API: Axios con interceptores para el manejo seguro de tokens.
+
+---
 
 ## 🛠️ Configuración e Instalación
 
-1.  **Base de Datos:**
-    * Asegúrese de tener una instancia de SQL Server activa.
-    * Actualice la cadena de conexión en `AcityChallenge.Api/appsettings.json`.
-    * Ejecute las migraciones (opcional si la BD ya existe): `dotnet ef database update --project AcityChallenge.Infrastructure --startup-project AcityChallenge.Api`.
+### 1. Requisitos Previos
+* SDK de .NET 9.0 o superior.
+* Node.js (LTS) y npm.
+* Instancia de SQL Server activa.
 
-2.  **Secretos JWT:**
-    * La API utiliza una clave secreta configurada en `appsettings.json` para firmar los tokens.
+### 2. Configuración del Backend
+1. Base de Datos: Actualice la cadena de conexión en AcityChallenge.Api/appsettings.json con sus credenciales de SQL Server.
+2. Migraciones: Ejecute el siguiente comando para crear las tablas necesarias:
 
-## 🏃 Cómo Ejecutar
+   dotnet ef database update --project AcityChallenge.Infrastructure --startup-project AcityChallenge.Api
 
-Desde la raíz del proyecto, ejecute:
-```bash
-dotnet run --project AcityChallenge.Api
+3. Ejecución: Desde la raíz del proyecto, ejecute:
+   
+   dotnet run --project AcityChallenge.Api
+   
+4. La API estará disponible en: http://localhost:5187.
+   
+   *Nota: El sistema cuenta con un DbInitializer que creará automáticamente al usuario administrador si la tabla está vacía.*
+
+### 3. Configuración del Frontend
+1. Instalación:
+
+   cd frontend && npm install
+
+2. Ejecución:
+
+   npm run dev
+   
+3. Acceso: http://localhost:5173.
+
+---
+
+## 🔑 Credenciales de Acceso (Seeder)
+
+El sistema inicializa los siguientes datos por defecto:
+* Usuario: seguridad@ejemplo.com
+* Contraseña: 12345678
+
+---
+
+## 📋 Funcionalidades Implementadas
+
+* Autenticación JWT: Login seguro y cierre de sesión con invalidación de sesión.
+* Gestión de Usuarios (CRUD): Listado dinámico, creación y eliminación física.
+* Perfil Dinámico: Identificación automática del usuario logueado en la cabecera.
+* UI Consistente: Sidebar con resaltado dinámico y botones de refresco.
