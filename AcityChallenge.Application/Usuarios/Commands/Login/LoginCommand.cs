@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using AcityChallenge.Domain.Entities;
 using System.Security.Claims;
 using System.Text;
 
@@ -37,20 +38,21 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         var expiryMinutes = int.Parse(_configuration["JwtSettings:ExpiryMinutes"]!);
         var expiresInSeconds = expiryMinutes * 60; // Convertimos a segundos (3600)
 
-        var token = GenerateJwtToken(usuario.Email);
+        var token = GenerateJwtToken(usuario);
 
         // Retornamos el formato solicitado: token y expiresIn
         return new LoginResponse(token, expiresInSeconds);
     }
 
-    private string GenerateJwtToken(string email)
+    private string GenerateJwtToken(Usuario usuario)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]!));
 
         var claims = new[] {
-            new Claim(JwtRegisteredClaimNames.Sub, email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Sub, usuario.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, usuario.Rol)
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
