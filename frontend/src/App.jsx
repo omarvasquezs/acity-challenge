@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-import Orders from './pages/Orders'; // Asegúrate de crear este archivo
+import Orders from './pages/Orders';
+import Users from './pages/Users';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -15,7 +16,7 @@ function App() {
         {/* RUTAS PRIVADAS: Solo accesibles con Token */}
         <Route element={<ProtectedRoute isPublic={false} />}>
           <Route path="/pedidos" element={<Orders />} />
-          {/* Aquí puedes agregar /usuarios etc */}
+          <Route path="/usuarios" element={<Users />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/pedidos" replace />} />
