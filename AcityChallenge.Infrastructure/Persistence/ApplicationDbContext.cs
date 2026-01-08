@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         : base(options) { }
 
     public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<Pedido> Pedidos => Set<Pedido>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,6 +24,12 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(150);
             entity.HasIndex(e => e.Email).IsUnique();
+        });
+
+        modelBuilder.Entity<Pedido>(entity =>
+        {
+            entity.Property(p => p.Total).HasColumnType("decimal(10,2)");
+            entity.HasIndex(p => p.NumeroPedido).IsUnique();
         });
     }
 }
