@@ -1,4 +1,5 @@
 using AcityChallenge.Application.Pedidos.Commands.ActualizarPedido;
+using Microsoft.AspNetCore.RateLimiting;
 using AcityChallenge.Application.Pedidos.Commands.CrearPedido;
 using AcityChallenge.Application.Pedidos.Commands.EliminarPedido;
 using AcityChallenge.Application.Pedidos.Queries.GetPedidoById;
@@ -13,6 +14,7 @@ namespace AcityChallenge.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("fixed")]
 public class PedidosController : ControllerBase
 {
     private readonly ISender _mediator;

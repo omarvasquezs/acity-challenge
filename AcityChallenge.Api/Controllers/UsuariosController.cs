@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AcityChallenge.Application.Usuarios.Commands.Login;
+using Microsoft.AspNetCore.RateLimiting;
 using AcityChallenge.Application.Usuarios.Commands.RegistrarUsuario;
 using AcityChallenge.Application.Usuarios.Common;
 using AcityChallenge.Application.Usuarios.Queries.GetUsuarioPerfil;
@@ -13,6 +14,7 @@ namespace AcityChallenge.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("fixed")]
 public class UsuariosController : ControllerBase
 {
     private readonly ISender _mediator;

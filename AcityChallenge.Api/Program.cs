@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using AcityChallenge.Infrastructure;
 using AcityChallenge.Application;
 using AcityChallenge.Application.Common.Interfaces;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +77,26 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddControllers();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter(policyName: "fixed", opt =>
+    {
+        opt.PermitLimit = 100;          // Máximo 100 peticiones
+        opt.Window = TimeSpan.FromSeconds(60); // Cada 1 minuto
+        opt.QueueLimit = 2;             // Solo 2 peticiones en cola
+    });
+});
+
+// Circuit Breaker con Polly
+builder.Services.AddHttpClient("ResilientClient")
+    .AddTransientHttpErrorPolicy(policy =>
+        policy.CircuitBreakerAsync(
+            handledEventsAllowedBeforeBreaking: 3,
+            durationOfBreak: TimeSpan.FromSeconds(30)
+        ));
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -111,6 +134,7 @@ app.MapGet("/weatherforecast", () =>
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 app.Run();
