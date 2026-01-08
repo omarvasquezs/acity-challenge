@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AcityChallenge.Application.Usuarios.Queries.GetUsuarioPerfil;
 
-// La Query recibe el Email extraído del Token
-public record GetUsuarioPerfilQuery(string Email) : IRequest<UsuarioPerfilResponse>;
+// Se agrega '?' para indicar que el resultado puede ser nulo
+public record GetUsuarioPerfilQuery(string Email) : IRequest<UsuarioPerfilResponse?>;
 
-public class GetUsuarioPerfilQueryHandler : IRequestHandler<GetUsuarioPerfilQuery, UsuarioPerfilResponse>
+public class GetUsuarioPerfilQueryHandler : IRequestHandler<GetUsuarioPerfilQuery, UsuarioPerfilResponse?>
 {
     private readonly IApplicationDbContext _context;
 
@@ -19,6 +19,7 @@ public class GetUsuarioPerfilQueryHandler : IRequestHandler<GetUsuarioPerfilQuer
 
     public async Task<UsuarioPerfilResponse?> Handle(GetUsuarioPerfilQuery request, CancellationToken cancellationToken)
     {
+        // El método FirstOrDefaultAsync puede devolver null si el correo no existe
         var usuario = await _context.Usuarios
             .Where(u => u.Email == request.Email)
             .Select(u => new UsuarioPerfilResponse(
