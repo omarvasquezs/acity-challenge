@@ -52,7 +52,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         var claims = new[] {
             new Claim(JwtRegisteredClaimNames.Sub, usuario.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, usuario.Rol)
+            new Claim(ClaimTypes.Role, usuario.Rol),
+            new Claim("SecurityStamp", usuario.SecurityStamp)
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
