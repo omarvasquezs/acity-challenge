@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AcityChallenge.Application.Usuarios.Queries.GetUsuarios;
+using AcityChallenge.Application.Usuarios.Commands.EliminarUsuario;
 
 namespace AcityChallenge.Api.Controllers;
 
@@ -47,5 +48,13 @@ public class UsuariosController : ControllerBase
     {
         // Enviamos la Query al Mediator para obtener todos los usuarios
         return Ok(await _mediator.Send(new GetUsuariosQuery()));
+    }
+
+    [Authorize(Roles = "Admin")] // Solo administradores pueden borrar usuarios
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<bool>> Eliminar(Guid id)
+    {
+        var result = await _mediator.Send(new EliminarUsuarioCommand(id));
+        return result ? Ok(result) : NotFound();
     }
 }
