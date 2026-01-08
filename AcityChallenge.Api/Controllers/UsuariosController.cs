@@ -2,6 +2,7 @@ using System.Security.Claims;
 using AcityChallenge.Application.Usuarios.Commands.Login;
 using Microsoft.AspNetCore.RateLimiting;
 using AcityChallenge.Application.Usuarios.Commands.RegistrarUsuario;
+using AcityChallenge.Application.Usuarios.Commands.ActualizarUsuario;
 using AcityChallenge.Application.Usuarios.Common;
 using AcityChallenge.Application.Usuarios.Queries.GetUsuarioPerfil;
 using MediatR;
@@ -32,12 +33,21 @@ public class UsuariosController : ControllerBase
     }
 
     [Authorize]
+    [HttpPut("{id}")]
+    public async Task<ActionResult<bool>> Actualizar(Guid id, [FromBody] ActualizarUsuarioCommand command)
+    {
+        // Validación de seguridad: el ID de la URL debe coincidir con el del comando
+        if (id != command.Id) return BadRequest("El ID del usuario no coincide.");
+
+        var result = await _mediator.Send(command);
+        return result ? Ok(result) : NotFound();
+    }
+
+    [Authorize]
     [HttpGet("perfil")]
     public async Task<ActionResult<UsuarioPerfilResponse>> GetPerfil()
     {
-        // Extraemos el email del claim 'sub' del Token JWT
         var email = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         if (string.IsNullOrEmpty(email)) return Unauthorized();
 
         var result = await _mediator.Send(new GetUsuarioPerfilQuery(email));
@@ -48,11 +58,10 @@ public class UsuariosController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<UsuarioPerfilResponse>>> Get()
     {
-        // Enviamos la Query al Mediator para obtener todos los usuarios
         return Ok(await _mediator.Send(new GetUsuariosQuery()));
     }
 
-    [Authorize(Roles = "Admin")] // Solo administradores pueden borrar usuarios
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult<bool>> Eliminar(Guid id)
     {
