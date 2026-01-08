@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
 import Layout from '../components/Layout';
-import { Plus, X, Loader2, Edit, Trash2, UserPlus, Shield, Lock } from 'lucide-react';
+import { X, Loader2, Edit, Trash2, UserPlus, Shield, Lock, RefreshCw } from 'lucide-react';
 
 export default function Users() {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
 
-    // Estado inicial actualizado con 'password' y roles corregidos
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
@@ -33,7 +32,6 @@ export default function Users() {
     const handleCreateUser = async (e) => {
         e.preventDefault();
         try {
-            // Se envía a /registrar según la definición de tu UsuariosController
             await api.post('/usuarios/registrar', formData);
             setShowModal(false);
             setFormData({ nombre: '', email: '', rol: 'User', password: '' });
@@ -51,12 +49,24 @@ export default function Users() {
                     <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Gestión de Usuarios</h2>
                     <p className="text-slate-500 text-sm italic">Administración de accesos Atlantic City.</p>
                 </div>
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="cursor-pointer bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
-                >
-                    <UserPlus size={20} /> Nuevo Usuario
-                </button>
+
+                <div className="flex gap-3">
+                    {/* Botón de refrescar añadido */}
+                    <button
+                        onClick={fetchUsers}
+                        className="p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer transition-all"
+                        title="Refrescar lista"
+                    >
+                        <RefreshCw size={20} className={isLoading ? 'animate-spin' : ''} />
+                    </button>
+
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className="cursor-pointer bg-blue-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
+                    >
+                        <UserPlus size={20} /> Nuevo Usuario
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -116,7 +126,6 @@ export default function Users() {
                 </table>
             </div>
 
-            {/* Modal de Registro Mejorado */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
@@ -147,7 +156,6 @@ export default function Users() {
                                 />
                             </div>
 
-                            {/* CAMPO DE CONTRASEÑA AÑADIDO */}
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Contraseña</label>
                                 <div className="relative">
@@ -163,7 +171,6 @@ export default function Users() {
                                 </div>
                             </div>
 
-                            {/* ROLES CORREGIDOS: Admin y User */}
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Rol del Sistema</label>
                                 <select
