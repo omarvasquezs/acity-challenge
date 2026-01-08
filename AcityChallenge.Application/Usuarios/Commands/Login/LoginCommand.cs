@@ -25,20 +25,22 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
 
     public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        // 1. Buscar al usuario
         var usuario = await _context.Usuarios
             .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
-        // 2. Validar con BCrypt
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.PasswordHash))
         {
             throw new Exception("Credenciales inválidas.");
         }
 
-        // 3. Generar Token
+        // Obtenemos los minutos de expiración de la configuración
+        var expiryMinutes = int.Parse(_configuration["JwtSettings:ExpiryMinutes"]!);
+        var expiresInSeconds = expiryMinutes * 60; // Convertimos a segundos (3600)
+
         var token = GenerateJwtToken(usuario.Email);
 
-        return new LoginResponse(usuario.Email, token);
+        // Retornamos el formato solicitado: token y expiresIn
+        return new LoginResponse(token, expiresInSeconds);
     }
 
     private string GenerateJwtToken(string email)
