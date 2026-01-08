@@ -21,10 +21,13 @@ public class GetUsuarioPerfilQueryHandler : IRequestHandler<GetUsuarioPerfilQuer
     {
         var usuario = await _context.Usuarios
             .Where(u => u.Email == request.Email)
-            .Select(u => new UsuarioPerfilResponse(u.Nombre, u.Email, u.FechaCreacion))
+            .Select(u => new UsuarioPerfilResponse(
+                u.Nombre,
+                u.Email,
+                u.Rol, // <--- AGREGA ESTA LÍNEA (El tercer parámetro string)
+                u.FechaCreacion
+            ))
             .FirstOrDefaultAsync(cancellationToken);
-
-        if (usuario == null) throw new Exception("Usuario no encontrado.");
 
         return usuario;
     }

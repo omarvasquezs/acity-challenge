@@ -19,7 +19,8 @@ public class GetUsuariosQueryHandler : IRequestHandler<GetUsuariosQuery, List<Us
             .Select(u => new UsuarioPerfilResponse(
                 u.Nombre,        // 1. string
                 u.Email,         // 2. string
-                u.FechaCreacion  // 3. DateTime
+                u.Rol,           // 3. string
+                u.FechaCreacion  // 4. DateTime
             ))
             .ToListAsync(cancellationToken);
     }

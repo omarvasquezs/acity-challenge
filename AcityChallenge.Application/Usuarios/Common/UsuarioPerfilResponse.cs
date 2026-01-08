@@ -1,3 +1,3 @@
 namespace AcityChallenge.Application.Usuarios.Common;
 
-public record UsuarioPerfilResponse(string Nombre, string Email, DateTime FechaCreacion);
+public record UsuarioPerfilResponse(string Nombre, string Email, string Rol, DateTime FechaCreacion);
