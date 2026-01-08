@@ -15,6 +15,6 @@ public class GetPedidoByIdQueryHandler : IRequestHandler<GetPedidoByIdQuery, Ped
     public async Task<Pedido?> Handle(GetPedidoByIdQuery request, CancellationToken cancellationToken)
     {
         return await _context.Pedidos
-            .FirstOrDefaultAsync(p => p.Id == request.Id && !p.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
     }
 }

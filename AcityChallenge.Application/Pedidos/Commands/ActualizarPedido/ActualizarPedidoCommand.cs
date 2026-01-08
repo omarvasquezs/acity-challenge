@@ -15,7 +15,7 @@ public class ActualizarPedidoCommandHandler : IRequestHandler<ActualizarPedidoCo
     {
         var pedido = await _context.Pedidos.FindAsync(new object[] { request.Id }, cancellationToken);
 
-        if (pedido == null || pedido.IsDeleted) return false;
+        if (pedido == null) return false;
 
         if (request.Total <= 0) throw new Exception("El total debe ser mayor a 0.");
 

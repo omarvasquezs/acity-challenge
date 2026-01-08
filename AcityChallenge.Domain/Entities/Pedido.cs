@@ -8,5 +8,4 @@ public class Pedido
     public DateTime Fecha { get; set; } = DateTime.UtcNow;
     public decimal Total { get; set; }
     public string Estado { get; set; } = "Registrado";
-    public bool IsDeleted { get; set; } = false;
 }

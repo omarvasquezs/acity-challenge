@@ -15,7 +15,6 @@ public class GetPedidosQueryHandler : IRequestHandler<GetPedidosQuery, List<Pedi
     public async Task<List<Pedido>> Handle(GetPedidosQuery request, CancellationToken cancellationToken)
     {
         return await _context.Pedidos
-            .Where(p => !p.IsDeleted) // Solo pedidos activos
             .OrderByDescending(p => p.Fecha)
             .ToListAsync(cancellationToken);
     }
