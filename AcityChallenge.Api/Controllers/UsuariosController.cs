@@ -6,6 +6,7 @@ using AcityChallenge.Application.Usuarios.Queries.GetUsuarioPerfil;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AcityChallenge.Application.Usuarios.Queries.GetUsuarios;
 
 namespace AcityChallenge.Api.Controllers;
 
@@ -38,5 +39,13 @@ public class UsuariosController : ControllerBase
 
         var result = await _mediator.Send(new GetUsuarioPerfilQuery(email));
         return Ok(result);
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<List<UsuarioPerfilResponse>>> Get()
+    {
+        // Enviamos la Query al Mediator para obtener todos los usuarios
+        return Ok(await _mediator.Send(new GetUsuariosQuery()));
     }
 }
