@@ -14,14 +14,16 @@ namespace AcityChallenge.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[EnableRateLimiting("fixed")]
+[EnableRateLimiting("fixed")] // Aplica la política de resiliencia configurada
 public class PedidosController : ControllerBase
 {
     private readonly ISender _mediator;
+
     public PedidosController(ISender mediator) => _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult<List<Pedido>>> Get() => Ok(await _mediator.Send(new GetPedidosQuery()));
+    public async Task<ActionResult<List<PedidoDto>>> Get()
+        => Ok(await _mediator.Send(new GetPedidosQuery()));
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Pedido>> GetById(int id)
@@ -31,8 +33,15 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create([FromBody] CrearPedidoCommand command)
-        => Ok(await _mediator.Send(command));
+    public async Task<ActionResult<int>> Create(CreatePedidoRequest request)
+    {
+        // Mapeamos el Request de la API al Comando de Aplicación
+        // El NumeroPedido ya no se envía desde aquí, se genera en el Handler
+        return await _mediator.Send(new CrearPedidoCommand(
+            request.Cliente,
+            request.Total,
+            request.Descripcion));
+    }
 
     [HttpPut("{id}")]
     public async Task<ActionResult> Update(int id, [FromBody] ActualizarPedidoCommand command)
@@ -49,3 +58,6 @@ public class PedidosController : ControllerBase
         return result ? NoContent() : NotFound();
     }
 }
+
+// DTO para la solicitud de creación desde el Frontend o Postman
+public record CreatePedidoRequest(string Cliente, decimal Total, string Descripcion);
