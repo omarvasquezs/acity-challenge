@@ -7,5 +7,6 @@ public class Usuario
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public string Rol { get; set; } = "User";
+    public string SecurityStamp { get; set; } = Guid.NewGuid().ToString();
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 }
