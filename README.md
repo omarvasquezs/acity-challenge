@@ -28,12 +28,16 @@ Este proyecto es una solución técnica integral desarrollada bajo los principio
 1. Base de Datos: Actualice la cadena de conexión en AcityChallenge.Api/appsettings.json con sus credenciales de SQL Server.
 2. Migraciones: Ejecute el siguiente comando para crear las tablas necesarias:
 
+   ```bash
    dotnet ef database update --project AcityChallenge.Infrastructure --startup-project AcityChallenge.Api
+   ```
 
 3. Ejecución: Desde la raíz del proyecto, ejecute:
-   
+
+   ```bash
    dotnet run --project AcityChallenge.Api
-   
+   ```
+
 4. La API estará disponible en: http://localhost:5187.
    
    *Nota: El sistema cuenta con un DbInitializer que creará automáticamente al usuario administrador si la tabla está vacía.*
@@ -41,12 +45,16 @@ Este proyecto es una solución técnica integral desarrollada bajo los principio
 ### 3. Configuración del Frontend
 1. Instalación:
 
+   ```bash
    cd frontend && npm install
+   ```
 
 2. Ejecución:
 
+   ```bash
    npm run dev
-   
+   ```
+
 3. Acceso: http://localhost:5173.
 
 ---
