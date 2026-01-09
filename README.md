@@ -63,5 +63,6 @@ El sistema inicializa los siguientes datos por defecto:
 
 * Autenticación JWT: Login seguro y cierre de sesión con invalidación de sesión.
 * Gestión de Usuarios (CRUD): Listado dinámico, creación y eliminación física.
+* Gestión de Pedidos (CRUD): Creación, actualización, listado y eliminación lógica.
 * Perfil Dinámico: Identificación automática del usuario logueado en la cabecera.
 * UI Consistente: Sidebar con resaltado dinámico y botones de refresco.
