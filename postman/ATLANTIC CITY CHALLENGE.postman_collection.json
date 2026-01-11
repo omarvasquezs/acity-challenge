@@ -224,6 +224,34 @@
 					"response": []
 				},
 				{
+					"name": "Obtener Pedido por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/pedidos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"pedidos",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Crear Pedido",
 					"request": {
 						"auth": {
@@ -240,7 +268,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"clienteNombre\": \"Cliente de Prueba\",\n    \"total\": 1500.50\n}",
+							"raw": "{\n    \"cliente\": \"Cliente de Prueba\",\n    \"total\": 1500.50,\n    \"descripcion\": \"Descripción del pedido\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -254,6 +282,43 @@
 							],
 							"path": [
 								"pedidos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Pedido",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"cliente\": \"Cliente Actualizado\",\n    \"total\": 2000.00,\n    \"estado\": \"Completado\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/pedidos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"pedidos",
+								"1"
 							]
 						}
 					},
@@ -275,13 +340,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/pedidos/REEMPLAZAR_POR_ID",
+							"raw": "{{base_url}}/pedidos/1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"pedidos",
-								"REEMPLAZAR_POR_ID"
+								"1"
 							]
 						}
 					},
